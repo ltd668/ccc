@@ -3,11 +3,10 @@ const config = {
     // 车主电话号码
     phone: '15016661007',
     
-    // 微信推送配置
-    wxPusher: {
-        appToken: 'AT_ExcwJ6SRUAUbpA2toDa6BvDZc1hdqbqo',
-        uids: ['UID_XZTWRWheonzTxdAq0vHn9VNVMUAt'],
-        apiUrl: 'https://wxpusher.zjiecode.com/api/send/message'
+    // Server酱 微信推送（不用APP，直接微信收消息）
+    serverChan: {
+        sendKey: "SCT138286TFnUPdzJkwDMcxcWNohpWkp4g",
+        apiUrl: "https://sctapi.ftqq.com/"
     },
     
     // 通知相关配置
