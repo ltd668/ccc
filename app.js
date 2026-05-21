@@ -89,7 +89,7 @@
             `).join('');
     }
 
-    // 通知车主功能
+    // 通知车主功能（已改为 Server酱 微信推送）
     async function notifyOwner() {
         const now = Date.now();
         if (now - state.lastNotifyTime < config.notification.cooldown) {
@@ -113,21 +113,21 @@
         await showToast('正在通知车主...', 'loading');
         
         try {
-            const response = await fetch(config.wxPusher.apiUrl, {
+            // 拼接紧急程度
+            const level = urgency === 'high' ? '【非常紧急】' : urgency === 'medium' ? '【紧急】' : '【普通】';
+            const title = "挪车通知";
+            const desp = level + message;
+
+            // Server酱 推送
+            const res = await fetch(`${config.serverChan.apiUrl}${config.serverChan.sendKey}.send`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    appToken: config.wxPusher.appToken,
-                    content: `[${urgency === 'high' ? '非常紧急' : urgency === 'medium' ? '紧急' : '普通'}] ${message}`,
-                    contentType: 1,
-                    uids: config.wxPusher.uids
-                })
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `title=${encodeURIComponent(title)}&desp=${encodeURIComponent(desp)}`
             });
 
-            if (!response.ok) throw new Error('Network response was not ok');
-
-            const data = await response.json();
-            if (data.code === 1000) {
+            const data = await res.json();
+            
+            if (data.code === 0) {
                 const notification = {
                     id: Date.now().toString(),
                     message,
@@ -146,7 +146,7 @@
                 elements.messageInput.value = '';
                 elements.messageTemplate.value = '';
             } else {
-                throw new Error(data.msg || '未知错误');
+                throw new Error("推送失败");
             }
         } catch (error) {
             console.error('通知发送失败:', error);
